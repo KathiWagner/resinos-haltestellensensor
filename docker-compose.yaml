@@ -1,0 +1,11 @@
+version: '3'
+volumes:
+    resin-data:
+services:
+  haltestellensensor:
+    build: .
+    restart: always
+    privileged: true
+    network_mode: "host"
+    volumes:
+     - 'resin-data:/data'
