@@ -9,7 +9,7 @@ Type=simple
 Restart=always
 RestartSec=1
 User=root
-ExecStart=/usr/bin/balena run -it -d --net="host" --privileged -v framectrdata:/framectrdata --name hss-app-container --rm hss-app
+ExecStart=/usr/local/bin/balena run -it -d --net="host" --privileged -v framectrdata:/framectrdata --name hss-app-container --rm hss-app
 
 [Install]
 WantedBy=multi-user.target

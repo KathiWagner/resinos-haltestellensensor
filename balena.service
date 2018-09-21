@@ -1,0 +1,13 @@
+[Unit]
+Description=Start the balena daemon.
+After=network.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/usr/local/bin/balenad
+
+[Install]
+WantedBy=multi-user.target
