@@ -10,9 +10,6 @@ RUN apt-get update \
  && newgrp wireshark \
  && apt-get install python3 python3-pip python3-dev gcc git iw build-essential net-tools wireless-tools ucf \ 
  && pip3 install howmanypeoplearearound 
- 
-ENV INITSYSTEM on
-ENV DBUS_SYSTEM_BUS_ADDRESS unix:path=/host/run/dbus/system_bus_socket
 
 RUN cd ~ \
  && git clone https://github.com/WiringPi/WiringPi.git \
@@ -39,3 +36,8 @@ CMD ifconfig wlan0 down \
  && python3 write_people_to_file.py & \
  (cd /root/lmic_pi/examples/grab-and-send && ./grab-and-send) & \
  /bin/bash
+
+#CMD cd /root/lmic_pi/examples/grab-and-send \
+# && python3 write_people_to_file.py & \
+# (cd /root/lmic_pi/examples/grab-and-send && ./grab-and-send) & \
+# /bin/bash
