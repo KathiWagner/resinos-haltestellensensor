@@ -20,9 +20,18 @@ if __name__ == "__main__":
                 #print('Running: echo -e "power on\ndiscoverable on\nquit" | sudo bluetoothctl')
                 status = sp.call(['echo', '-e', '"power on\ndiscoverable on\nquit"', '|', 'bluetoothctl'])
                 if status == 0:
-                    status = sp.call(['obexpushd', '-B', '-o', '/home/pi/updates', '-s', 'put',
-                                      '/home/pi/resinos-haltestellensensor/updatefeature/run_update.py',
-                                      '-p', '/home/pi/updates/obexpushdpid.txt'])
+                    # obexp = sp.Popen(['obexpushd', '-B', '-o', '/home/pi/updates', '-s', 'put',
+                    #                   '/home/pi/resinos-haltestellensensor/updatefeature/run_update.py',
+                    #                   '-p', '/home/pi/updates/obexpushdpid.txt'])
+                    # print("Started bluetooth file server!")
+                    # print(obexp.stderr)
+                    # obexp.wait()
+                    # sp.Popen(['obexpushd', '-B', '-d', '-o', '/home/pi/updates', '-s', 'put',
+                    #           '/home/pi/resinos-haltestellensensor/updatefeature/run_update.py',
+                    #           '-p', '/home/pi/updates/obexpushdpid.txt'], close_fds=True)
+                    sp.Popen(['obexpushd', '-B', '-d', '-o', '/home/pi/updates', '-s',
+                              '/home/pi/resinos-haltestellensensor/updatefeature/run_update_in_shell.sh',
+                              '-p', '/home/pi/updates/obexpushdpid.txt'], close_fds=True)
 
             elif arg.startswith("off"):
                 #print('Running: echo -e "discoverable off\npower off\nquit" | sudo bluetoothctl')
