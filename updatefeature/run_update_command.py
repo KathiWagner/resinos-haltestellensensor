@@ -1,8 +1,6 @@
 import subprocess as sp
 import json
 import os
-import io
-import sys
 
 
 if __name__ == "__main__":
@@ -15,26 +13,23 @@ if __name__ == "__main__":
         cmd = cmdreader.readline().strip('\r\n \t')
         print('Got command: ' + cmd)
         if cmd.startswith("bluetooth:"):
+            pidpath = '/home/pi/updates/obexpushdpid.txt'
             arg = cmd[cmd.find(" ")+1:].strip()
             if arg.startswith("on"):
                 #print('Running: echo -e "power on\ndiscoverable on\nquit" | sudo bluetoothctl')
                 status = sp.call(['echo', '-e', '"power on\ndiscoverable on\nquit"', '|', 'bluetoothctl'])
                 if status == 0:
-                    # obexp = sp.Popen(['obexpushd', '-B', '-o', '/home/pi/updates', '-s', 'put',
-                    #                   '/home/pi/resinos-haltestellensensor/updatefeature/run_update.py',
-                    #                   '-p', '/home/pi/updates/obexpushdpid.txt'])
-                    # print("Started bluetooth file server!")
-                    # print(obexp.stderr)
-                    # obexp.wait()
-                    # sp.Popen(['obexpushd', '-B', '-d', '-o', '/home/pi/updates', '-s', 'put',
-                    #           '/home/pi/resinos-haltestellensensor/updatefeature/run_update.py',
-                    #           '-p', '/home/pi/updates/obexpushdpid.txt'], close_fds=True)
+                    #Spawn detached obexpushd process for receiving files via bluetooth
                     sp.Popen(['obexpushd', '-B', '-d', '-o', '/home/pi/updates', '-s',
                               '/home/pi/resinos-haltestellensensor/updatefeature/run_update_in_shell.sh',
-                              '-p', '/home/pi/updates/obexpushdpid.txt'], close_fds=True)
+                              '-p', pidpath], close_fds=True)
 
             elif arg.startswith("off"):
-                #print('Running: echo -e "discoverable off\npower off\nquit" | sudo bluetoothctl')
+                if os.path.exists(pidpath):
+                    with open(pidpath, 'r') as reader:
+                        pid = reader.read().rstrip()
+                        sp.call(['kill', '-9', pid])
+                os.remove('/home/pi/updates/*')
                 status = sp.call(['echo', '-e', '"discoverable off\npower off\nquit"', '|', 'bluetoothctl'])
             else:
                 print('Invalid argument "' + arg + '" for "bluetooth" command!')
