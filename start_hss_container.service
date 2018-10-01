@@ -11,9 +11,8 @@ RestartSec=1
 User=root
 TTYPath=/dev/tty2
 StandardInput=tty
-StandardOutput=tty
 ExecPreStart=/usr/local/bin/balena stop hss-app-container
-ExecStart=/usr/local/bin/balena run -it -t --net="host" --privileged -v framectrdata:/framectrdata --name hss-app-container --rm hss-app
+ExecStart=/usr/local/bin/balena run -it --net="host" --privileged -v framectrdata:/framectrdata --name hss-app-container --rm hss-app
 
 [Install]
 WantedBy=multi-user.target

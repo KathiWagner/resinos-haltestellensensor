@@ -33,11 +33,11 @@ CMD ifconfig wlan0 down \
  && iwconfig wlan0 mode monitor \
  && ifconfig wlan0 up \
  && cd /root/lmic_pi/examples/grab-and-send \
- && python3 write_people_to_file.py & \
- (cd /root/lmic_pi/examples/grab-and-send && ./grab-and-send) & \
+ && nohup python3 -u write_people_to_file.py 2>&1 > write_people_to_file.log & \
+ (cd /root/lmic_pi/examples/grab-and-send && nohup ./grab-and-send 2>&1 > grab-and-send.log) & \
  /bin/bash
 
 #CMD cd /root/lmic_pi/examples/grab-and-send \
-# && python3 write_people_to_file.py & \
-# (cd /root/lmic_pi/examples/grab-and-send && ./grab-and-send) & \
+# && python3 write_people_to_file.py > write_people_to_file.log & \
+# (cd /root/lmic_pi/examples/grab-and-send && ./grab-and-send > grab-and-send.log) & \
 # /bin/bash
