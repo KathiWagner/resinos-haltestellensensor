@@ -1,0 +1,14 @@
+[Unit]
+Description=Start the hss updatefeature.
+After=balena.service
+Requires=balena.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/bin/bash /home/pi/resinos-haltestellensensor/updatefeature/watch_updatefile.sh
+
+[Install]
+WantedBy=multi-user.target

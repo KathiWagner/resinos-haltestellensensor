@@ -1,6 +1,7 @@
 import subprocess as sp
 import json
 import os
+import time
 
 
 if __name__ == "__main__":
@@ -16,8 +17,13 @@ if __name__ == "__main__":
             pidpath = '/home/pi/updates/obexpushdpid.txt'
             arg = cmd[cmd.find(" ")+1:].strip()
             if arg.startswith("on"):
-                #print('Running: echo -e "power on\ndiscoverable on\nquit" | sudo bluetoothctl')
-                status = sp.call(['echo', '-e', '"power on\ndiscoverable on\nquit"', '|', 'bluetoothctl'])
+                # Turn bluetooth on
+                ps = sp.Popen('bluetoothctl', stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.STDOUT, bufsize=1)
+                ps.stdin.write(b'power on\n')
+                ps.stdin.write(b'discoverable on\n')
+                out, err = ps.communicate(b'quit\n')
+                print(out.decode('utf-8'))
+                status = ps.returncode
                 if status == 0:
                     #Spawn detached obexpushd process for receiving files via bluetooth
                     sp.Popen(['obexpushd', '-B', '-d', '-o', '/home/pi/updates', '-s',
@@ -28,9 +34,23 @@ if __name__ == "__main__":
                 if os.path.exists(pidpath):
                     with open(pidpath, 'r') as reader:
                         pid = reader.read().rstrip()
-                        sp.call(['kill', '-9', pid])
-                os.remove('/home/pi/updates/*')
-                status = sp.call(['echo', '-e', '"discoverable off\npower off\nquit"', '|', 'bluetoothctl'])
+                        status = sp.call(['kill', '-9', pid])
+                        print('Successfully killed obexpushd bluetooth file transfer server!')
+                # delete all leftover files except the update log and hidden ones
+                files = os.listdir('/home/pi/updates')
+                files.remove('update.log')
+                for filename in files:
+                    if not filename.startswith('.'):
+                        path = os.path.join('/home/pi/updates/', filename)
+                        print('Removing file: ' + path)
+                        os.remove(path)
+                # Turn bluetooth off
+                ps = sp.Popen('bluetoothctl', stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.STDOUT, bufsize=1)
+                ps.stdin.write(b'discoverable off\n')
+                ps.stdin.write(b'power off\n')
+                out, err = ps.communicate(b'quit\n')
+                print(out.decode('utf-8'))
+                status = ps.returncode
             else:
                 print('Invalid argument "' + arg + '" for "bluetooth" command!')
 
