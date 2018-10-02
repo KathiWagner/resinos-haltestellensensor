@@ -15,6 +15,7 @@ if __name__ == "__main__":
         print('Got command: ' + cmd)
         if cmd.startswith("bluetooth:"):
             pidpath = '/home/pi/updates/obexpushdpid.txt'
+            registrypath = '/home/pi/resinos-haltestellensensor/updatefeature/deviceRegistry'
             arg = cmd[cmd.find(" ")+1:].strip()
             if arg.startswith("on"):
                 # Turn bluetooth on
@@ -29,6 +30,31 @@ if __name__ == "__main__":
                     sp.Popen(['obexpushd', '-B', '-d', '-o', '/home/pi/updates', '-s',
                               '/home/pi/resinos-haltestellensensor/updatefeature/run_update_in_shell.sh',
                               '-p', pidpath], close_fds=True)
+
+            elif arg.startswith("register"):
+                mac = arg[arg.find(" ")+1:].strip()
+                registered = False
+                print("Registrating device with MAC: " + mac)
+                # Add MAC address to registry
+                if os.path.exists(registrypath):
+                    with open(registrypath, 'r') as reader:
+                        for line in reader:
+                            if line.rstrip() == mac:
+                                registered = True
+                                print("Device already registered, nothing to do!")
+                                break
+                if not registered:
+                    with open(registrypath, 'a') as appender:
+                        appender.write(mac + '\n')
+                        print("Successfully registered device!")
+                status = 0
+
+            elif arg.startswith("clearregistry"):
+                print("Clearing device registry...")
+                with open(registrypath, 'w') as writer:
+                    pass
+                    print("Success!")
+                status = 0
 
             elif arg.startswith("off"):
                 if os.path.exists(pidpath):
