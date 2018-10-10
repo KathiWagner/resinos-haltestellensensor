@@ -34,7 +34,7 @@ if __name__ == "__main__":
             elif arg.startswith("register"):
                 mac = arg[arg.find(" ")+1:].strip()
                 registered = False
-                print("Registrating device with MAC: " + mac)
+                print("Registering device with MAC: " + mac)
                 # Add MAC address to registry
                 if os.path.exists(registrypath):
                     with open(registrypath, 'r') as reader:
