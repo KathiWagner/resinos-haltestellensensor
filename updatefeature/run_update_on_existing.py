@@ -1,9 +1,11 @@
 #! /usr/bin/python3
 
 import sys
+sys.path.extend('/home/pi/resinos-haltestellensensor/updatefeature')
 import subprocess as sp
 import os
 import time
+import manage_signature
 
 params = {}
 params['Name'] = 'hss-app-2018-09-21.7z'
@@ -44,19 +46,26 @@ log('Update file received. Starting update...\n')
 output = ''
 imgtarname = params['Name'][:params['Name'].rfind('.')] + '.tar'
 imgtarpath = os.path.join(updatedir, imgtarname)
+signaturefilepath = os.path.join(updatedir, 'signature.txt')
 try:
-    output = sp.check_output(['p7zip', '-d', '-k', '-f', params['Name']], cwd=updatedir, stderr=sp.STDOUT).decode(
-        'ascii')
+    output = sp.check_output(['p7zip', '-d', '-k', '-f', params['Name']], cwd=updatedir, stderr=sp.STDOUT).decode('ascii')
     log(output)
 except sp.CalledProcessError as ex:
     log(str(ex))
     close_and_exit(1)
+# Check signature
+with open('/var/lib/balena/volumes/framectrdata/_data/cryptokey.txt') as keyfile:
+    key = keyfile.read().rstrip()
+    if not manage_signature.check(key, imgtarpath, signaturefilepath):
+        log("Signature check failed for update file! Exiting...\n")
+        close_and_exit(1)
+log("Signature match, check successful!\n")
+# Load and run new image as container
 output = sp.check_output(['balena', 'load', '-i', imgtarname], cwd=updatedir, stderr=sp.STDOUT).decode('ascii')
 if output.find('no such file or directory') < 0:
     log("Image loaded successfully! Restarting container...\n")
     try:
-        output = sp.check_output(['balena', 'stop', 'hss-app-container'], cwd=updatedir, stderr=sp.STDOUT).decode(
-            'ascii')
+        output = sp.check_output(['balena', 'stop', 'hss-app-container'], cwd=updatedir, stderr=sp.STDOUT).decode('ascii')
         log(output)
     except sp.CalledProcessError as ex:
         log(str(ex))
@@ -75,19 +84,19 @@ if output.find('hss-app-container') > 0:
             os.remove(updatefilepath)
         if os.path.exists(imgtarpath):
             os.remove(imgtarpath)
+        if os.path.exists(signaturefilepath):
+            os.remove(signaturefilepath)
         status = sp.call(['balena', 'image', 'prune', '-f'])
         log('Cleanup finished! Exiting...\n')
-        close_and_exit(0)
     except:
-        pass
-    log('Cleanup could not be finished. Please clean up manually! Exiting...\n')
+        log('Cleanup could not be finished. Please clean up manually! Exiting...\n')
     close_and_exit(0)
 
 else:
-    log('Update unsuccessful. Checking status of old container...')
+    log('Update unsuccessful. Checking status of old container...\n')
     output = sp.check_output(['balena', 'container', 'ls'], cwd=updatedir).decode('ascii')
     if output.find('hss-app-container') > 0:
-        log('Old container still up and running! Exiting...')
-        sys.exit(1)
+        log('Old container still up and running! Exiting...\n')
+        close_and_exit(1)
     log('Old container not up and running! Please revert manually! Exiting...\n')
     close_and_exit(1)

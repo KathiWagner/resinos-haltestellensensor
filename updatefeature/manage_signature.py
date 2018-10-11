@@ -31,9 +31,9 @@ class AESCipher(object):
     def _unpad(s):
         return s[:-ord(s[len(s)-1:])]
 
-def get_raw_signature(key, file):
+def get_raw_signature(file):
     sha512obj = hashlib.sha512()
-    with open(file, 'r') as reader:
+    with open(file, 'rb') as reader:
         chunk = reader.read(52428800)  # Read 50MB
         while len(chunk) == 52428800:
             sha512obj.update(chunk)
@@ -46,14 +46,14 @@ def get_raw_signature(key, file):
         raise AssertionError('Sha512 digest size for input file is 0')
 
 def sign(key, file, signaturefile):
-        raw_signature = get_raw_signature(key, file)
+        raw_signature = get_raw_signature(file)
         cipher = AESCipher(key)
         signature = cipher.encrypt(raw_signature)
         with open(signaturefile, 'w') as writer:
             writer.write(signature)
 
 def check(key, file, signaturefile):
-    raw_signature = get_raw_signature(key, file)
+    raw_signature = get_raw_signature(file)
     cipher = AESCipher(key)
     with open(signaturefile, 'r') as reader:
         foreign_sig = reader.read().rstrip()
