@@ -10,13 +10,15 @@ import manage_signature
 #Log options - file or stderr
 logopt = 'file'
 loghandle = None
+logfilepath = '/home/pi/updates/update.log'
+from_mac = None
 
 
 def get_log_handle():
     global loghandle
     if not loghandle:
         if logopt == 'file':
-            loghandle = open('/home/pi/updates/update.log', 'a')
+            loghandle = open(logfilepath, 'a')
         else:
             loghandle = sys.stderr
     return loghandle
@@ -32,6 +34,12 @@ def close_and_exit(status):
         loghandle.close()
     except:
         pass
+    # Send update log out
+    if logopt == 'file':
+        try:
+            sp.call(['obexftp', '-b', from_mac, '-B', '1', '-U', 'none', '-p', logfilepath])
+        except:
+            pass
     sys.exit(status)
 
 # PUT request
@@ -55,6 +63,9 @@ if sys.argv[1] == 'put':
             if params['From'].find(line.rstrip()):
                 verified = True
                 break
+
+    from_mac = params['From'][params['From'].find('[')+1:params['From'].find(']')]
+    log('Sender MAC: ' + from_mac)
 
     if not verified:
         sys.stderr.write('Socket ' + params['From'] + ' is not registered as a trusted device! Exiting...\n')
