@@ -7,8 +7,9 @@ RUN apt-get update \
  && yes | dpkg-reconfigure -f noninteractive wireshark-common \
  && addgroup wireshark \
  && usermod -a -G wireshark ${USER:-root} \
- && newgrp wireshark \
- && apt-get install python3 python3-pip python3-dev gcc git iw build-essential net-tools wireless-tools ucf \ 
+ && newgrp wireshark
+
+RUN apt-get install python3 python3-pip python3-dev gcc git iw build-essential net-tools wireless-tools ucf \ 
  && pip3 install howmanypeoplearearound pycrypto pyffx
 
 RUN cd ~ \
@@ -20,17 +21,14 @@ RUN cd ~ \
 RUN cd ~ \
  && git clone https://github.com/clemensvonschwerin/lmic_pi.git \
  && cd lmic_pi/lmic \
- && git checkout master \
+ && git checkout generic \
  && make clean \
  && make \
  && cd ../examples/grab-and-send \
  && make clean \
  && make
+ 
+RUN echo "100 0f" > /root/lmic_pi/examples/grab-and-send/measurement.txt
 
-CMD ifconfig wlan0 down \
- && iwconfig wlan0 mode monitor \
- && ifconfig wlan0 up \
- && cd /root/lmic_pi/examples/grab-and-send \
- && nohup python3 -u write_people_to_file.py 2>&1 > write_people_to_file.log & \
- (cd /root/lmic_pi/examples/grab-and-send && nohup ./grab-and-send 2>&1 > grab-and-send.log) & \
+CMD (cd /root/lmic_pi/examples/grab-and-send && nohup ./grab-and-send 2>&1 > grab-and-send.log) & \
  /bin/bash
