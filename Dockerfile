@@ -9,8 +9,7 @@ RUN apt-get update \
  && usermod -a -G wireshark ${USER:-root} \
  && newgrp wireshark
 
-RUN apt-get install python3 python3-pip python3-dev gcc git iw 
-build-essential net-tools wireless-tools ucf \ 
+RUN apt-get install python3 python3-pip python3-dev gcc git iw build-essential net-tools wireless-tools ucf \ 
  && pip3 install howmanypeoplearearound pycrypto pyffx
 
 RUN cd ~ \
