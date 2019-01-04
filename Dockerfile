@@ -21,7 +21,7 @@ RUN cd ~ \
 RUN cd ~ \
  && git clone https://github.com/clemensvonschwerin/lmic_pi.git \
  && cd lmic_pi/lmic \
- && git checkout generic \
+ && git checkout master \
  && make clean \
  && make \
  && cd ../examples/grab-and-send \
