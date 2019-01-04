@@ -1,5 +1,5 @@
 FROM resin/rpi-raspbian
-MAINTAINER Clemens von Schwerin <c.schwerin@hs-ulm.de>
+MAINTAINER Katharina Wagner <k.wagner@hs-ulm.de>
 RUN apt-get update \
  && apt-get upgrade --yes \
  && apt-get install iproute2 \
