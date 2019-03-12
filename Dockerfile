@@ -19,9 +19,9 @@ RUN cd ~ \
  && ./build
  
 RUN cd ~ \
- && git clone https://github.com/clemensvonschwerin/lmic_pi.git \
+ && git clone https://github.com/KathiWagner/lmic_pi.git \
  && cd lmic_pi/lmic \
- && git checkout generic \
+ && git checkout testsensor_mac \
  && make clean \
  && make \
  && cd ../examples/grab-and-send \
