@@ -12,6 +12,8 @@ RUN apt-get update \
 RUN apt-get install python3 python3-pip python3-dev gcc git iw build-essential net-tools wireless-tools ucf \ 
  && pip3 install howmanypeoplearearound pycrypto pyffx
 
+RUN echo 'hallo'
+
 RUN cd ~ \
  && git clone https://github.com/WiringPi/WiringPi.git \
  && cd WiringPi \
@@ -21,7 +23,7 @@ RUN cd ~ \
 RUN cd ~ \
  && git clone https://github.com/KathiWagner/lmic_pi.git \
  && cd lmic_pi/lmic \
- && git checkout testsensor_mac \
+ && git checkout testsensor_mac2 \
  && make clean \
  && make \
  && cd ../examples/grab-and-send \
